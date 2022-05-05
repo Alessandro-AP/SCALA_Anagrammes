@@ -1,4 +1,4 @@
-import scala.collection.immutable._
+import scala.collection.immutable.*
 import scala.io.Source
 
 
@@ -36,8 +36,8 @@ val dictionary: List[Word] =
  *  number of occurrences, but the characters appear in sorted order.
  */
 
-def fingerPrint(s: Word): FingerPrint = ???
-def fingerPrint(s: Sentence): FingerPrint = ???
+def fingerPrint(s: Word): FingerPrint = s.sorted
+def fingerPrint(s: Sentence): FingerPrint = s.mkString.sorted
 
 
 /** `matchingWords` is a `Map` from fingerprints to a sequence of all
@@ -52,11 +52,11 @@ def fingerPrint(s: Sentence): FingerPrint = ???
  *   "aet"-> List("ate", "eat", "tea")
  */
 
-val matchingWords: Map[FingerPrint, List[Word]] = ???
+val matchingWords: Map[FingerPrint, List[Word]] = dictionary.map(w => (fingerPrint(w), w)).groupMap(_._1)(_._2)
 
 
 /** Returns all the anagrams of a given word. */
-def wordAnagrams(word: Word): List[Word] = ???
+def wordAnagrams(word: Word): List[Word] = matchingWords.getOrElse(fingerPrint(word),Nil)
 
 // Test code with for example:
 @main def testWordAnagrams: Unit =
@@ -78,12 +78,19 @@ def wordAnagrams(word: Word): List[Word] = ???
  * 
  *  You are not allowed to use the `combination` method from the Scala API.
  */
-def subseqs(fp: FingerPrint): List[FingerPrint] = ???
+def sub(fp: FingerPrint): List[FingerPrint] =
+  "" :: (for {
+    i <- 0 until fp.length
+    j <- i+1 to fp.length
+  } yield fp.substring(i, j)).toList
+
+def subseqs(fp: FingerPrint): List[FingerPrint] =
+  (sub(fp) ++ sub(fp.distinct)).distinct
 
 
 // Test code with for example:
 @main def testSubseqs: Unit =
-  println(subseqs("aabbc"))
+  println(subseqs("abbc"))
 
 
 /** Subtracts fingerprint `y` from fingerprint `x`.
@@ -95,7 +102,7 @@ def subseqs(fp: FingerPrint): List[FingerPrint] = ???
  *  You are not allowed to use the `diff` method from the Scala API.
  */
 
-def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = ???
+def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = if subseqs(x).contains(y) then  x.diff(y) else x
 
 // Test code with for example:
 @main def testSubtract: Unit =
