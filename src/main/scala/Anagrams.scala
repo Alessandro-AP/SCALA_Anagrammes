@@ -26,9 +26,13 @@ type FingerPrint = String
   // You can begin your development with this simple example.
   // A dictionary of English words is given to you as an external file (linuxwords.txt)
   // that you must load to use with your program.
-val dictionary: List[Word] =
-  List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal",
-       "I", "love", "you", "olive")
+  //val dictionary: List[Word] =
+  //  List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal",
+  //       "I", "love", "you", "olive")
+
+val in = Source.fromFile("src/main/resources/linuxwords.txt")
+val dictionary : List[Word] = in.getLines.toList filter (word => word.forall(ch => ch.isLetter))
+
 
 
 /** Converts a word/sentence into its fingerprint.
@@ -156,3 +160,4 @@ def sentenceAnagrams(sentence: Sentence): List[Sentence] =
   println(sentenceAnagrams(List("you", "olive")))
   println()
   println(sentenceAnagrams(List("I", "love", "you")))
+  in.close()
