@@ -36,8 +36,8 @@ val dictionary: List[Word] =
  *  number of occurrences, but the characters appear in sorted order.
  */
 
-def fingerPrint(s: Word): FingerPrint = s.sorted
-def fingerPrint(s: Sentence): FingerPrint = s.mkString.sorted
+def fingerPrint(s: Word): FingerPrint = s.toLowerCase().sorted
+def fingerPrint(s: Sentence): FingerPrint = s.mkString.toLowerCase().sorted
 
 
 /** `matchingWords` is a `Map` from fingerprints to a sequence of all
@@ -78,14 +78,20 @@ def wordAnagrams(word: Word): List[Word] = matchingWords.getOrElse(fingerPrint(w
  * 
  *  You are not allowed to use the `combination` method from the Scala API.
  */
-def sub(fp: FingerPrint): List[FingerPrint] =
-  "" :: (for {
-    i <- 0 until fp.length
-    j <- i+1 to fp.length
-  } yield fp.substring(i, j)).toList
+
+def customComb[A](ls: List[A], k: Int): List[List[A]] = {
+  if (k == 0) List(Nil)
+  else ls match {
+    case Nil => List()
+    case h :: t => customComb(t, k) ++ customComb(t, k - 1).map(h :: _)
+  }
+}
 
 def subseqs(fp: FingerPrint): List[FingerPrint] =
-  (sub(fp) ++ sub(fp.distinct)).distinct
+  (for {
+    i <- 0 to fp.length
+    x <- customComb(fp.toList, i)
+  } yield x.mkString).toList
 
 
 // Test code with for example:
@@ -128,10 +134,25 @@ def subtract(x: FingerPrint, y: FingerPrint): FingerPrint = if subseqs(x).contai
  *  Note: There is only one anagram of an empty sentence.
  */
 
-def sentenceAnagrams(sentence: Sentence): List[Sentence] = ???
+def sentenceAnagrams(sentence: Sentence): List[Sentence] =
+  def inner(fp: FingerPrint) : List[Sentence] =
+    fp match {
+      case fp if fp.isEmpty => List(Nil)
+      case _ =>
+        for
+          subseq <- subseqs(fp)
+          anagram <- wordAnagrams(subseq)
+          xs <- inner(subtract(fp, subseq))
+        yield
+          anagram :: xs
+    }
+  inner(fingerPrint(sentence))
+
 
 // Test code with for example:
 @main def testSentenceAnagrams: Unit =
   println(sentenceAnagrams(List("eat", "tea")))
+  println()
   println(sentenceAnagrams(List("you", "olive")))
+  println()
   println(sentenceAnagrams(List("I", "love", "you")))
