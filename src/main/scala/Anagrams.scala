@@ -1,6 +1,9 @@
 import scala.collection.immutable.*
-import scala.io.Source
+import scala.io.{BufferedSource, Source}
 
+/**
+ * Authors: Alessandro Parrino and Daniel Sciarra
+ */
 
 /** A word is simply a `String`. */
 type Word = String
@@ -30,7 +33,7 @@ type FingerPrint = String
   //  List("ate", "eat", "tea", "pot", "top", "sonja", "jason", "normal",
   //       "I", "love", "you", "olive")
 
-val in = Source.fromFile("src/main/resources/linuxwords.txt")
+val in: BufferedSource = Source.fromFile("src/main/resources/linuxwords.txt")
 val dictionary : List[Word] = in.getLines.toList filter (word => word.forall(ch => ch.isLetter))
 
 
@@ -83,6 +86,7 @@ def wordAnagrams(word: Word): List[Word] = matchingWords.getOrElse(fingerPrint(w
  *  You are not allowed to use the `combination` method from the Scala API.
  */
 
+// Our implementation of `combination` method.
 def customComb[A](ls: List[A], k: Int): List[List[A]] = {
   if (k == 0) List(Nil)
   else ls match {
